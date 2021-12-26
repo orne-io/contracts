@@ -387,6 +387,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "orne-vesting"
+version = "0.0.0"
+dependencies = [
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "cosmwasm-storage",
+ "cw20",
+ "orne-token",
+ "schemars",
+ "serde",
+]
+
+[[package]]
 name = "pkcs8"
 version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
