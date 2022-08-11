@@ -1,0 +1,26 @@
+[package]
+edition = "2021"
+name = "orne-periphery"
+version = "0.1.0"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+backtraces = ["cosmwasm-std/backtraces"]
+# use library feature to disable all instantiate/execute/query exports
+library = []
+
+[dependencies]
+cosmwasm-std = "1.0"
+cw2 = "0.14"
+cw20 = "0.14"
+cw20-base = "0.14"
+thiserror = "1.0"
+
+[dependencies.serde]
+default-features = false
+features = ["derive"]
+version = "1.0"
