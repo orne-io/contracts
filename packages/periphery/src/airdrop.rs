@@ -1,7 +1,7 @@
+use cosmwasm_std::Uint128;
 use serde::{Deserialize, Serialize};
 
 pub mod msg {
-    use cosmwasm_std::Uint128;
     use cw20::Cw20ReceiveMsg;
 
     use super::*;
@@ -40,5 +40,47 @@ pub mod msg {
             recipient: String,
             amount: Uint128,
         },
+    }
+
+    #[derive(Serialize, Deserialize, Clone, PartialEq, Debug)]
+    #[serde(rename_all = "snake_case")]
+    pub enum QueryMsg {
+        Config {},
+        State {},
+        UserInfo { address: String },
+        HasUserClaimed { address: String },
+    }
+
+    #[derive(Serialize, Deserialize, Clone, PartialEq, Debug)]
+    pub struct MigrateMsg {}
+}
+
+pub mod response {
+    use super::*;
+
+    #[derive(Serialize, Deserialize, Clone, PartialEq, Debug)]
+    pub struct ConfigResponse {
+        pub owner: String,
+        pub token_address: String,
+        pub merkle_roots: Vec<String>,
+        pub from_timestamp: u64,
+        pub to_timestamp: u64,
+    }
+
+    #[derive(Serialize, Deserialize, Clone, PartialEq, Debug)]
+    pub struct StateResponse {
+        pub total_airdrop_size: Uint128,
+        pub unclaimed_tokens: Uint128,
+    }
+
+    #[derive(Serialize, Deserialize, Clone, PartialEq, Debug)]
+    pub struct UserInfoResponse {
+        pub airdrop_amount: Uint128,
+        pub tokens_withdrawn: bool,
+    }
+
+    #[derive(Serialize, Deserialize, Clone, PartialEq, Debug)]
+    pub struct HasUserClaimedResponse {
+        pub has_claimed: bool,
     }
 }

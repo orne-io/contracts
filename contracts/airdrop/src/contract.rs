@@ -1,10 +1,13 @@
-use cosmwasm_std::{entry_point, DepsMut, Env, MessageInfo, Response, StdError, StdResult};
+use cosmwasm_std::{
+    entry_point, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdError, StdResult,
+};
 use cw2::set_contract_version;
-use orne_periphery::airdrop::msg::{ExecuteMsg, InstantiateMsg};
+use orne_periphery::airdrop::msg::{ExecuteMsg, InstantiateMsg, MigrateMsg, QueryMsg};
 
 use crate::state::{Config, State, CONFIG, STATE};
 
 pub mod execute;
+pub mod query;
 
 // version info for migration info
 const CONTRACT_NAME: &str = "mars_airdrop";
@@ -74,4 +77,19 @@ pub fn execute(deps: DepsMut, env: Env, info: MessageInfo, msg: ExecuteMsg) -> S
             execute::transfer_unclaimed_tokens(deps, env, info, recipient, amount)
         }
     }
+}
+
+#[cfg_attr(not(feature = "library"), entry_point)]
+pub fn query(deps: Deps, _: Env, msg: QueryMsg) -> StdResult<Binary> {
+    match msg {
+        QueryMsg::Config {} => query::config(deps),
+        QueryMsg::State {} => query::state(deps),
+        QueryMsg::UserInfo { address } => query::user_info(deps, address),
+        QueryMsg::HasUserClaimed { address } => query::has_user_claimed(deps, address),
+    }
+}
+
+#[cfg_attr(not(feature = "library"), entry_point)]
+pub fn migrate(_: DepsMut, _: Env, _: MigrateMsg) -> StdResult<Response> {
+    Ok(Response::default())
 }
