@@ -1,0 +1,17 @@
+[workspace]
+members = [
+  # "packages/*",
+  "contracts/*",
+]
+
+[profile.release.package.orne-token]
+codegen-units = 1
+debug = false
+debug-assertions = false
+incremental = false
+opt-level = 3
+
+[profile.release]
+lto = true
+overflow-checks = true
+rpath = false
