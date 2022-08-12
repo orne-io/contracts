@@ -6,7 +6,7 @@ pub mod msg {
 
     use super::*;
 
-    #[derive(Serialize, Deserialize, Clone, PartialEq, Debug)]
+    #[derive(Serialize, Deserialize, Clone, PartialEq, Eq, Debug)]
     pub struct InstantiateMsg {
         pub owner: Option<String>,
         pub token_address: String,
@@ -42,7 +42,7 @@ pub mod msg {
         },
     }
 
-    #[derive(Serialize, Deserialize, Clone, PartialEq, Debug)]
+    #[derive(Serialize, Deserialize, Clone, PartialEq, Eq, Debug)]
     #[serde(rename_all = "snake_case")]
     pub enum QueryMsg {
         Config {},
@@ -51,14 +51,14 @@ pub mod msg {
         HasUserClaimed { address: String },
     }
 
-    #[derive(Serialize, Deserialize, Clone, PartialEq, Debug)]
+    #[derive(Serialize, Deserialize, Clone, PartialEq, Eq, Debug)]
     pub struct MigrateMsg {}
 }
 
 pub mod response {
     use super::*;
 
-    #[derive(Serialize, Deserialize, Clone, PartialEq, Debug)]
+    #[derive(Serialize, Deserialize, Clone, PartialEq, Eq, Debug)]
     pub struct ConfigResponse {
         pub owner: String,
         pub token_address: String,
@@ -67,19 +67,19 @@ pub mod response {
         pub to_timestamp: u64,
     }
 
-    #[derive(Serialize, Deserialize, Clone, PartialEq, Debug)]
+    #[derive(Serialize, Deserialize, Clone, PartialEq, Eq, Debug)]
     pub struct StateResponse {
         pub total_airdrop_size: Uint128,
         pub unclaimed_tokens: Uint128,
     }
 
-    #[derive(Serialize, Deserialize, Clone, PartialEq, Debug)]
+    #[derive(Serialize, Deserialize, Clone, PartialEq, Eq, Debug)]
     pub struct UserInfoResponse {
         pub airdrop_amount: Uint128,
         pub tokens_withdrawn: bool,
     }
 
-    #[derive(Serialize, Deserialize, Clone, PartialEq, Debug)]
+    #[derive(Serialize, Deserialize, Clone, PartialEq, Eq, Debug)]
     pub struct HasUserClaimedResponse {
         pub has_claimed: bool,
     }
