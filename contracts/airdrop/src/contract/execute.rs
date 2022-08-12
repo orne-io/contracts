@@ -66,6 +66,7 @@ pub(crate) fn update_config(
         attributes.push(attr("new_to_timestamp", to_timestamp.to_string()))
     }
 
+    CONFIG.save(deps.storage, &config)?;
     Ok(Response::default())
 }
 
