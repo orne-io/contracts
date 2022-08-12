@@ -84,12 +84,12 @@ pub fn claim(
     let mut state = STATE.load(deps.storage)?;
 
     // Airdrop should have started
-    if config.airdrop_awaiting(&env) {
+    if config.airdrop_awaiting(env.block.time.seconds()) {
         return Err(StdError::generic_err("Airdrop hasn't started yet"));
     }
 
     // Airdrop should not be done concluded
-    if config.airdrop_concluded(&env) {
+    if config.airdrop_concluded(env.block.time.seconds()) {
         return Err(StdError::generic_err("Airdrop has concluded"));
     }
 
@@ -151,7 +151,7 @@ pub fn transfer_unclaimed_tokens(
     }
 
     // Can only be called after airdrop
-    if !config.airdrop_concluded(&env) {
+    if !config.airdrop_concluded(env.block.time.seconds()) {
         return Err(StdError::generic_err(format!(
             "{} seconds left before unclaimed tokens can be transferred",
             { config.to_timestamp - env.block.time.seconds() }
