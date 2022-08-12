@@ -1,4 +1,4 @@
-use cosmwasm_std::{Addr, Env, Uint128};
+use cosmwasm_std::{Addr, Uint128};
 use cw_storage_plus::{Item, Map};
 use serde::{Deserialize, Serialize};
 
@@ -6,7 +6,7 @@ pub const CONFIG: Item<Config> = Item::new("config");
 pub const STATE: Item<State> = Item::new("state");
 pub const USERS: Map<&Addr, UserInfo> = Map::new("users");
 
-#[derive(Serialize, Deserialize, Clone, PartialEq, Debug)]
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, Debug)]
 #[serde(rename_all = "snake_case")]
 pub struct Config {
     /// Account who can update config
@@ -22,21 +22,20 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn airdrop_running(&self, env: &Env) -> bool {
-        self.from_timestamp < env.block.time.seconds()
-            && env.block.time.seconds() < self.to_timestamp
+    pub fn airdrop_running(&self, time: u64) -> bool {
+        self.from_timestamp <= time && time < self.to_timestamp
     }
 
-    pub fn airdrop_awaiting(&self, env: &Env) -> bool {
-        self.from_timestamp > env.block.time.seconds()
+    pub fn airdrop_awaiting(&self, time: u64) -> bool {
+        self.from_timestamp > time
     }
 
-    pub fn airdrop_concluded(&self, env: &Env) -> bool {
-        self.to_timestamp < env.block.time.seconds()
+    pub fn airdrop_concluded(&self, time: u64) -> bool {
+        self.to_timestamp < time
     }
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, Debug)]
 #[serde(rename_all = "snake_case")]
 pub struct State {
     /// Total token issuance used as airdrop incentives
@@ -45,7 +44,7 @@ pub struct State {
     pub unclaimed_tokens: Uint128,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, Debug)]
 pub struct UserInfo {
     /// Total MARS airdrop tokens claimable by the user
     pub claimed_amount: Uint128,
@@ -59,5 +58,33 @@ impl Default for UserInfo {
             claimed_amount: Uint128::zero(),
             tokens_withdrawn: false,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn config_timing() {
+        let config = Config {
+            owner: Addr::unchecked("test"),
+            token_address: Addr::unchecked("test"),
+            merkle_roots: vec![],
+            from_timestamp: 10,
+            to_timestamp: 20,
+        };
+
+        assert!(config.airdrop_awaiting(9));
+        assert!(!config.airdrop_awaiting(10));
+        assert!(!config.airdrop_awaiting(21));
+
+        assert!(!config.airdrop_running(9));
+        assert!(config.airdrop_running(10));
+        assert!(!config.airdrop_running(21));
+
+        assert!(!config.airdrop_concluded(9));
+        assert!(!config.airdrop_concluded(10));
+        assert!(config.airdrop_concluded(21));
     }
 }

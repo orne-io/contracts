@@ -66,6 +66,7 @@ pub(crate) fn update_config(
         attributes.push(attr("new_to_timestamp", to_timestamp.to_string()))
     }
 
+    CONFIG.save(deps.storage, &config)?;
     Ok(Response::default())
 }
 
@@ -83,21 +84,22 @@ pub fn claim(
     let mut state = STATE.load(deps.storage)?;
 
     // Airdrop should have started
-    if config.airdrop_awaiting(&env) {
+    if config.airdrop_awaiting(env.block.time.seconds()) {
         return Err(StdError::generic_err("Airdrop hasn't started yet"));
     }
 
-    // Airdrop should not be done concluded
-    if config.airdrop_concluded(&env) {
+    // Airdrop should not have concluded
+    if config.airdrop_concluded(env.block.time.seconds()) {
         return Err(StdError::generic_err("Airdrop has concluded"));
     }
 
+    // Check merkle root index
     let merkle_root = config.merkle_roots.get(root_index as usize);
     if merkle_root.is_none() {
         return Err(StdError::generic_err("Incorrect Merkle Root Index"));
     }
 
-    // Check claim
+    // Check merkle proof
     if !verify_claim(&recipient, claim_amount, merkle_proof, merkle_root.unwrap()) {
         return Err(StdError::generic_err("Incorrect Merkle Proof"));
     }
@@ -150,7 +152,7 @@ pub fn transfer_unclaimed_tokens(
     }
 
     // Can only be called after airdrop
-    if !config.airdrop_concluded(&env) {
+    if !config.airdrop_concluded(env.block.time.seconds()) {
         return Err(StdError::generic_err(format!(
             "{} seconds left before unclaimed tokens can be transferred",
             { config.to_timestamp - env.block.time.seconds() }
