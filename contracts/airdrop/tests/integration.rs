@@ -1,7 +1,7 @@
 use cosmwasm_std::{attr, Addr, Uint128};
 use cw_multi_test::{App, ContractWrapper, Executor};
 use orne_periphery::airdrop::{
-    msg::{InstantiateMsg, QueryMsg},
+    msg::{ExecuteMsg, InstantiateMsg, QueryMsg},
     response::{ConfigResponse, StateResponse},
 };
 
@@ -121,4 +121,55 @@ fn proper_initialization() {
 
     assert_eq!(res.total_airdrop_size, init_msg.airdrop_size);
     assert_eq!(res.unclaimed_tokens, init_msg.airdrop_size);
+}
+
+#[test]
+fn update_config() {
+    let mut app = mock_app();
+    let (airdrop_instance, init_msg, _, _) = init_contracts(&mut app);
+
+    // Only owner can update
+    let err = app
+        .execute_contract(
+            Addr::unchecked("wrong_owner"),
+            airdrop_instance.clone(),
+            &ExecuteMsg::UpdateConfig {
+                owner: None,
+                from_timestamp: None,
+                to_timestamp: None,
+            },
+            &[],
+        )
+        .unwrap_err()
+        .root_cause()
+        .to_string();
+
+    assert_eq!(err, "Generic error: Only owner can update configuration");
+
+    let new_owner = "new_owner".to_string();
+    let from_timestamp = 1571997419;
+    let to_timestamp = 1591797419;
+
+    let msg = ExecuteMsg::UpdateConfig {
+        owner: Some(new_owner.clone()),
+        from_timestamp: Some(from_timestamp),
+        to_timestamp: Some(to_timestamp),
+    };
+
+    app.execute_contract(
+        Addr::unchecked(init_msg.owner.unwrap()),
+        airdrop_instance.clone(),
+        &msg,
+        &[],
+    )
+    .unwrap();
+
+    let res: ConfigResponse = app
+        .wrap()
+        .query_wasm_smart(&airdrop_instance, &QueryMsg::Config {})
+        .unwrap();
+
+    assert_eq!(res.owner, new_owner);
+    assert_eq!(res.from_timestamp, from_timestamp);
+    assert_eq!(res.to_timestamp, to_timestamp);
 }
