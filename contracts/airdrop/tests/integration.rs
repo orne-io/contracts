@@ -255,7 +255,7 @@ fn claim() {
         b.time = Timestamp::from_seconds(1571798419)
     });
 
-    // Claim not allowed (airdrop not yet started)
+    // Claim fails (airdrop not yet started)
     let err = app
         .execute_contract(
             Addr::unchecked("terra17lmam6zguazs5q5u6z5mmx76uj63gldnse2pdp".to_string()),
@@ -411,7 +411,26 @@ fn claim() {
     assert_eq!(res.balance, 250_000_000u128.into());
 
     // Claim fails (already claimed)
+    let err = app
+        .execute_contract(
+            Addr::unchecked("terra17lmam6zguazs5q5u6z5mmx76uj63gldnse2pdp".to_string()),
+            airdrop_instance.clone(),
+            &claim_msg,
+            &[],
+        )
+        .unwrap_err()
+        .root_cause()
+        .to_string();
 
+    assert_eq!(err, "Generic error: Already claimed");
+
+    // Update Block to post airdrop
+    app.update_block(|b| {
+        b.height += 172800;
+        b.time = Timestamp::from_seconds(15718974240)
+    });
+
+    // Claim fails (airdrop concluded)
     let err = app
         .execute_contract(
             Addr::unchecked("terra17lmam6zguazs5q5u6z5mmx76uj63gldnse2pdp".to_string()),
@@ -423,7 +442,7 @@ fn claim() {
         .root_cause()
         .to_string();
 
-    assert_eq!(err, "Generic error: Already claimed");
+    assert_eq!(err, "Generic error: Airdrop has concluded");
 }
 
 #[test]
