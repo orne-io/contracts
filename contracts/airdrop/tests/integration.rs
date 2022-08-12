@@ -187,7 +187,7 @@ fn claim() {
         &mut app,
         Addr::unchecked(init_msg.owner.clone().unwrap()),
         token_instance.clone(),
-        Uint128::from(100_000_000_000u128),
+        100_000_000_000u128.into(),
         init_msg.owner.clone().unwrap(),
     );
 
@@ -424,4 +424,135 @@ fn claim() {
         .to_string();
 
     assert_eq!(err, "Generic error: Already claimed");
+}
+
+#[test]
+fn test_transfer_unclaimed_tokens() {
+    let mut app = mock_app();
+    let (airdrop_instance, init_msg, token_instance, _) = init_contracts(&mut app);
+
+    // Mint tokens for owner
+    mint_token(
+        &mut app,
+        Addr::unchecked(init_msg.owner.clone().unwrap()),
+        token_instance.clone(),
+        100_000_000_000u64.into(),
+        init_msg.owner.clone().unwrap(),
+    );
+
+    // Send tokens to airdrop contract
+    app.execute_contract(
+        Addr::unchecked(init_msg.owner.clone().unwrap()),
+        token_instance.clone(),
+        &Cw20ExecuteMsg::Transfer {
+            recipient: airdrop_instance.to_string(),
+            amount: 100_000_000_000u128.into(),
+        },
+        &[],
+    )
+    .unwrap();
+
+    // Check airdrop contract balance
+    let res = app
+        .wrap()
+        .query_wasm_smart::<cw20::BalanceResponse>(
+            &token_instance,
+            &cw20::Cw20QueryMsg::Balance {
+                address: airdrop_instance.to_string(),
+            },
+        )
+        .unwrap();
+
+    assert_eq!(res.balance, 100_000_000_000u128.into());
+
+    // Can only be called by the owner
+    let err = app
+        .execute_contract(
+            Addr::unchecked("wrong_owner"),
+            airdrop_instance.clone(),
+            &ExecuteMsg::TransferUnclaimedTokens {
+                recipient: "recipient".to_string(),
+                amount: 1000000u128.into(),
+            },
+            &[],
+        )
+        .unwrap_err()
+        .root_cause()
+        .to_string();
+
+    assert_eq!(err, "Generic error: Only owner can transfer unclaimed");
+
+    // Claim period is not over
+    app.update_block(|b| {
+        b.height += 17280;
+        b.time = Timestamp::from_seconds(1571897419)
+    });
+
+    // Can only be called after the claim period is over
+    let err = app
+        .execute_contract(
+            Addr::unchecked(init_msg.owner.clone().unwrap()),
+            airdrop_instance.clone(),
+            &ExecuteMsg::TransferUnclaimedTokens {
+                recipient: "recipient".to_string(),
+                amount: 1000000u128.into(),
+            },
+            &[],
+        )
+        .unwrap_err()
+        .root_cause()
+        .to_string();
+
+    assert_eq!(
+        err,
+        "Generic error: 9900000 seconds left before unclaimed tokens can be transferred"
+    );
+
+    // claim period is over
+    app.update_block(|b| {
+        b.height += 17280;
+        b.time = Timestamp::from_seconds(1581797420)
+    });
+
+    // Amount needs to be less than remaining balance
+    let err = app
+        .execute_contract(
+            Addr::unchecked(init_msg.owner.clone().unwrap()),
+            airdrop_instance.clone(),
+            &ExecuteMsg::TransferUnclaimedTokens {
+                recipient: "recipient".to_string(),
+                amount: 1_000_000_000_000u128.into(),
+            },
+            &[],
+        )
+        .unwrap_err()
+        .root_cause()
+        .to_string();
+
+    assert_eq!(err, "Cannot Sub with 100000000000 and 1000000000000");
+
+    // Should successfully transfer
+    app.execute_contract(
+        Addr::unchecked(init_msg.owner.unwrap()),
+        airdrop_instance.clone(),
+        &ExecuteMsg::TransferUnclaimedTokens {
+            recipient: "recipient".to_string(),
+            amount: 10_000_000u128.into(),
+        },
+        &[],
+    )
+    .unwrap();
+
+    // Check airdrop contract balance decreased
+    let res = app
+        .wrap()
+        .query_wasm_smart::<cw20::BalanceResponse>(
+            &token_instance,
+            &cw20::Cw20QueryMsg::Balance {
+                address: airdrop_instance.to_string(),
+            },
+        )
+        .unwrap();
+
+    assert_eq!(res.balance, 99_990_000_000u128.into());
 }
