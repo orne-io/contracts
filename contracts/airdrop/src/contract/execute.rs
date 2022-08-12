@@ -88,17 +88,18 @@ pub fn claim(
         return Err(StdError::generic_err("Airdrop hasn't started yet"));
     }
 
-    // Airdrop should not be done concluded
+    // Airdrop should not have concluded
     if config.airdrop_concluded(env.block.time.seconds()) {
         return Err(StdError::generic_err("Airdrop has concluded"));
     }
 
+    // Check merkle root index
     let merkle_root = config.merkle_roots.get(root_index as usize);
     if merkle_root.is_none() {
         return Err(StdError::generic_err("Incorrect Merkle Root Index"));
     }
 
-    // Check claim
+    // Check merkle proof
     if !verify_claim(&recipient, claim_amount, merkle_proof, merkle_root.unwrap()) {
         return Err(StdError::generic_err("Incorrect Merkle Proof"));
     }
