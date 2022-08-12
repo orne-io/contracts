@@ -1,8 +1,9 @@
-use cosmwasm_std::{attr, Addr, Uint128};
+use cosmwasm_std::{attr, Addr, Timestamp, Uint128};
+use cw20::Cw20ExecuteMsg;
 use cw_multi_test::{App, ContractWrapper, Executor};
 use orne_periphery::airdrop::{
     msg::{ExecuteMsg, InstantiateMsg, QueryMsg},
-    response::{ConfigResponse, StateResponse},
+    response::{ConfigResponse, HasUserClaimedResponse, StateResponse, UserInfoResponse},
 };
 
 fn mock_app() -> App {
@@ -56,10 +57,12 @@ fn init_contracts(app: &mut App) -> (Addr, InstantiateMsg, Addr, u64) {
     let airdrop_init_msg = InstantiateMsg {
         owner: Some(owner.to_string()),
         token_address: token_instance.clone().into_string(),
-        merkle_roots: vec!["merkle_roots".to_string()],
+        merkle_roots: vec![
+            "cdcdfad1c342f5f55a2639dcae7321a64cd000807fa24c2c4ddaa944fd52d34e".to_string(),
+        ],
         from_timestamp: Some(1571897419),
         to_timestamp: 1581797419,
-        airdrop_size: 1000_000000u128.into(), // 1000 $TEST
+        airdrop_size: 100_000_000_000u128.into(), // utoken, 100,000 token
     };
 
     let airdrop_instance = app
@@ -81,7 +84,7 @@ fn init_contracts(app: &mut App) -> (Addr, InstantiateMsg, Addr, u64) {
     )
 }
 
-fn _mint_cw20(app: &mut App, owner: Addr, token_instance: Addr, amount: Uint128, to: String) {
+fn mint_token(app: &mut App, owner: Addr, token_instance: Addr, amount: Uint128, to: String) {
     let msg = cw20::Cw20ExecuteMsg::Mint {
         recipient: to.clone(),
         amount,
@@ -172,4 +175,253 @@ fn update_config() {
     assert_eq!(res.owner, new_owner);
     assert_eq!(res.from_timestamp, from_timestamp);
     assert_eq!(res.to_timestamp, to_timestamp);
+}
+
+#[test]
+fn claim() {
+    let mut app = mock_app();
+    let (airdrop_instance, init_msg, token_instance, _) = init_contracts(&mut app);
+
+    // Mint token for owner
+    mint_token(
+        &mut app,
+        Addr::unchecked(init_msg.owner.clone().unwrap()),
+        token_instance.clone(),
+        Uint128::from(100_000_000_000u128),
+        init_msg.owner.clone().unwrap(),
+    );
+
+    // Send tokens to airdrop contract
+    app.execute_contract(
+        Addr::unchecked(init_msg.owner.unwrap()),
+        token_instance.clone(),
+        &Cw20ExecuteMsg::Transfer {
+            recipient: airdrop_instance.to_string(),
+            amount: 100_000_000_000u128.into(),
+        },
+        &[],
+    )
+    .unwrap();
+
+    // Check airdrop contract balance
+    let res = app
+        .wrap()
+        .query_wasm_smart::<cw20::BalanceResponse>(
+            &token_instance,
+            &cw20::Cw20QueryMsg::Balance {
+                address: airdrop_instance.to_string(),
+            },
+        )
+        .unwrap();
+
+    assert_eq!(res.balance, 100_000_000_000u128.into());
+
+    let claim_msg = ExecuteMsg::Claim {
+        claim_amount: 250000000u128.into(),
+        merkle_proof: vec![
+            "7719b79a65e5aa0bbfd144cf5373138402ab1c374d9049e490b5b61c23d90065".to_string(),
+            "60368f2058e0fb961a7721a241f9b973c3dd6c57e10a627071cd81abca6aa490".to_string(),
+        ],
+        root_index: 0,
+    };
+    let claim_msg_wrong_amount = ExecuteMsg::Claim {
+        claim_amount: 210000000u128.into(),
+        merkle_proof: vec![
+            "7719b79a65e5aa0bbfd144cf5373138402ab1c374d9049e490b5b61c23d90065".to_string(),
+            "60368f2058e0fb961a7721a241f9b973c3dd6c57e10a627071cd81abca6aa490".to_string(),
+        ],
+        root_index: 0,
+    };
+    let claim_msg_incorrect_root = ExecuteMsg::Claim {
+        claim_amount: 250000000u128.into(),
+        merkle_proof: vec![
+            "7719b79a65e4aa0bbfd144cf5373138402ab1c374d9049e490b5b61c23d90065".to_string(),
+            "60368f2058e0fb961a7721a241f9b973c3dd6c57e10a627071cd81abca6aa490".to_string(),
+        ],
+        root_index: 5,
+    };
+    let claim_msg_incorrect_proof = ExecuteMsg::Claim {
+        claim_amount: 250000000u128.into(),
+        merkle_proof: vec![
+            "7719b79a65e4aa0bbfd144cf5373138402ab1c374d9049e490b5b61c23d90065".to_string(),
+            "60368f2058e0fb961a7721a241f9b973c3dd6c57e10a627071cd81abca6aa490".to_string(),
+        ],
+        root_index: 0,
+    };
+
+    // Claim period has not started yet
+    app.update_block(|b| {
+        b.height += 17280;
+        b.time = Timestamp::from_seconds(1571798419)
+    });
+
+    // Claim not allowed (airdrop not yet started)
+    let err = app
+        .execute_contract(
+            Addr::unchecked("terra17lmam6zguazs5q5u6z5mmx76uj63gldnse2pdp".to_string()),
+            airdrop_instance.clone(),
+            &claim_msg,
+            &[],
+        )
+        .unwrap_err()
+        .root_cause()
+        .to_string();
+
+    assert_eq!(err, "Generic error: Airdrop hasn't started yet");
+
+    // Update Block to test successful claim
+    app.update_block(|b| {
+        b.height += 17280;
+        b.time = Timestamp::from_seconds(1571897424)
+    });
+
+    // Claim fails (Incorrect merkle root index)
+    let err = app
+        .execute_contract(
+            Addr::unchecked("terra17lmam6zguazs5q5u6z5mmx76uj63gldnse2pdp".to_string()),
+            airdrop_instance.clone(),
+            &claim_msg_incorrect_root,
+            &[],
+        )
+        .unwrap_err()
+        .root_cause()
+        .to_string();
+
+    assert_eq!(err, "Generic error: Incorrect Merkle Root Index");
+
+    // Claim fails (Incorrect merkle proof)
+    let err = app
+        .execute_contract(
+            Addr::unchecked("terra17lmam6zguazs5q5u6z5mmx76uj63gldnse2pdp".to_string()),
+            airdrop_instance.clone(),
+            &claim_msg_incorrect_proof,
+            &[],
+        )
+        .unwrap_err()
+        .root_cause()
+        .to_string();
+
+    assert_eq!(err, "Generic error: Incorrect Merkle Proof");
+
+    // Claim fails (Incorrect merkle proof - wrong amount)
+    let err = app
+        .execute_contract(
+            Addr::unchecked("terra17lmam6zguazs5q5u6z5mmx76uj63gldnse2pdp".to_string()),
+            airdrop_instance.clone(),
+            &claim_msg_wrong_amount,
+            &[],
+        )
+        .unwrap_err()
+        .root_cause()
+        .to_string();
+
+    assert_eq!(err, "Generic error: Incorrect Merkle Proof");
+
+    // User hasn't yet claimed the airdrop
+    let res = app
+        .wrap()
+        .query_wasm_smart::<HasUserClaimedResponse>(
+            &airdrop_instance,
+            &QueryMsg::HasUserClaimed {
+                address: "terra17lmam6zguazs5q5u6z5mmx76uj63gldnse2pdp".to_string(),
+            },
+        )
+        .unwrap();
+
+    assert!(!res.has_claimed);
+
+    let res = app
+        .wrap()
+        .query_wasm_smart::<UserInfoResponse>(
+            &airdrop_instance,
+            &QueryMsg::UserInfo {
+                address: "terra17lmam6zguazs5q5u6z5mmx76uj63gldnse2pdp".to_string(),
+            },
+        )
+        .unwrap();
+
+    assert!(Uint128::is_zero(&res.airdrop_amount));
+    assert!(!res.tokens_withdrawn);
+
+    // Claim succeed
+    let res = app
+        .execute_contract(
+            Addr::unchecked("terra17lmam6zguazs5q5u6z5mmx76uj63gldnse2pdp".to_string()),
+            airdrop_instance.clone(),
+            &claim_msg,
+            &[],
+        )
+        .unwrap();
+
+    assert_eq!(
+        res.events[1].attributes[1],
+        attr("action", "airdrop::execute::claim")
+    );
+    assert_eq!(
+        res.events[1].attributes[2],
+        attr("recipient", "terra17lmam6zguazs5q5u6z5mmx76uj63gldnse2pdp")
+    );
+    assert_eq!(res.events[1].attributes[3], attr("airdrop", "250000000"));
+
+    // Verify user successfully claimed airdrop
+    let res = app
+        .wrap()
+        .query_wasm_smart::<HasUserClaimedResponse>(
+            &airdrop_instance,
+            &QueryMsg::HasUserClaimed {
+                address: "terra17lmam6zguazs5q5u6z5mmx76uj63gldnse2pdp".to_string(),
+            },
+        )
+        .unwrap();
+
+    assert!(res.has_claimed);
+
+    let res = app
+        .wrap()
+        .query_wasm_smart::<UserInfoResponse>(
+            &airdrop_instance,
+            &QueryMsg::UserInfo {
+                address: "terra17lmam6zguazs5q5u6z5mmx76uj63gldnse2pdp".to_string(),
+            },
+        )
+        .unwrap();
+
+    assert_eq!(res.airdrop_amount, 250_000_000u128.into());
+    assert!(res.tokens_withdrawn);
+
+    let res = app
+        .wrap()
+        .query_wasm_smart::<StateResponse>(&airdrop_instance, &QueryMsg::State {})
+        .unwrap();
+
+    assert_eq!(res.total_airdrop_size, 100_000_000_000u128.into());
+    assert_eq!(res.unclaimed_tokens, 99_750_000_000u128.into());
+
+    // Check user token balance
+    let res = app
+        .wrap()
+        .query_wasm_smart::<cw20::BalanceResponse>(
+            &token_instance,
+            &cw20::Cw20QueryMsg::Balance {
+                address: "terra17lmam6zguazs5q5u6z5mmx76uj63gldnse2pdp".to_string(),
+            },
+        )
+        .unwrap();
+
+    assert_eq!(res.balance, 250_000_000u128.into());
+
+    // Claim fails (already claimed)
+
+    let err = app
+        .execute_contract(
+            Addr::unchecked("terra17lmam6zguazs5q5u6z5mmx76uj63gldnse2pdp".to_string()),
+            airdrop_instance,
+            &claim_msg,
+            &[],
+        )
+        .unwrap_err()
+        .root_cause()
+        .to_string();
+
+    assert_eq!(err, "Generic error: Already claimed");
 }
