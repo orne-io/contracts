@@ -10,7 +10,7 @@ Install deps
 pnpm i
 ```
 
-Generate a json file with the airdrop list
+Generate a `airdrop.json` file at the root with the airdrop list
 
 Example:
 
