@@ -13,9 +13,11 @@ Library and tests are based on [Mars Protocol's](https://github.com/mars-protoco
 
 ## Merkle tree
 
-### 1. Create a json distribution list
-
 See [merkle-cli](./merkle-cli/).
+
+### `airdrop.json`
+
+* [Testnet + Mainnet](https://github.com/orne-io/contracts/files/9331613/airdrop.zip)
 
 ## Instantiate
 
