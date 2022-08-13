@@ -14,7 +14,7 @@ Tasks are run through [`cargo-make`](https://github.com/sagiegurari/cargo-make).
 | Name                          | Mainnet | Testnet |
 | ----------------------------- | ------- | ------- |
 | [token](contracts/token/)     | -       | `2995`  |
-| [airdrop](contracts/airdrop/) | -       | -       |
+| [airdrop](contracts/airdrop/) | -       | `2996`  |
 
 ## Packages
 
