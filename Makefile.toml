@@ -1,0 +1,23 @@
+[env]
+BASENAME = {script = ["basename \"$(pwd)\""]}
+CARGO_MAKE_EXTEND_WORKSPACE_MAKEFILE = true
+PWD = {script = ["pwd"]}
+
+[tasks.wasm]
+args = ["build", "--release", "--target", "--target", "wasm32-unknown-unknown"]
+command = "cargo"
+
+[tasks.wasm-opti]
+args = [
+  "run",
+  "--rm",
+  "-v",
+  "${PWD}:/code",
+  "--mount",
+  "type=volume,source=${BASENAME}_cache,target=/code/target",
+  "--mount",
+  "type=volume,source=registry_cache,target=/usr/local/cargo/registry",
+  "cosmwasm/workspace-optimizer:0.12.6",
+]
+command = "docker"
+workspace = false
