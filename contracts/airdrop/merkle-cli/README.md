@@ -1,47 +1,44 @@
-merkle-airdrop-cli
-==================
+# merkle-cli
 
-This is a helper client shipped along contract.
-Use this to generate root, generate proofs and verify proofs
+A small util to generate merkle trees and proofs.
 
-## Installation
+## Usage
 
-```shell
-yarn install
-yarn link
+Install deps
+
+```bash
+pnpm i
 ```
 
-Binary will be placed to path.
+Generate a json file with the airdrop list
 
-## Airdrop file format
+Example:
 
 ```json
 [
-  { "address": "wasm1k9hwzxs889jpvd7env8z49gad3a3633vg350tq", "amount": "100"},
-  { "address": "wasm1uy9ucvgerneekxpnfwyfnpxvlsx5dzdpf0mzjd", "amount": "1010"}
+    {
+        "address": "terra1fmcjjt6yc9wqup2r06urnrd928jhrde6gcld6n",
+        "amount": "10"
+    },
+    {
+        "address": "terra1lkccuqgj6sjwjn8gsa9xlklqv4pmrqg9dx2fxc",
+        "amount": "2414140"
+    },
+    {
+        "address": "terra1333veey879eeqcff8j3gfcgwt8cfrg9mq20v6f",
+        "amount": "1000"
+    }
 ]
 ```
 
-## Commands
+Get the merkle root
 
-**Generate Root:**
-```shell
-yarn exec merkle-airdrop-cli -- generateRoot --file ../testdata/airdrop_stage_2_list.json
+```bash
+pnpm start get-root
 ```
 
-**Generate proof:**
-```shell
-yarn exec merkle-airdrop-cli -- generateProofs --file ../testdata/airdrop_stage_2_list.json \
-  --address wasm1ylna88nach9sn5n7qe7u5l6lh7dmt6lp2y63xx \
-  --amount 1000000000
-```
+Get the merkle proof for an account
 
-**Verify proof:**
-```shell
-PROOFS='[ "27e9b1ec8cb64709d0a8d3702344561674199fe81b885f1f9c9b2fb268795962","280777995d054081cbf208bccb70f8d736c1766b81d90a1fd21cd97d2d83a5cc","3946ea1758a5a2bf55bae1186168ad35aa0329805bc8bff1ca3d51345faec04a"
-]'
-yarn exec merkle-airdrop-cli -- verifyProofs --file ../testdata/airdrop.json \
-  --address wasm1k9hwzxs889jpvd7env8z49gad3a3633vg350tq \
-  --amount 100 \
-  --proofs $PROOFS
+```bash
+pnpm start get-proof terra1lkccuqgj6sjwjn8gsa9xlklqv4pmrqg9dx2fxc 2414140
 ```
