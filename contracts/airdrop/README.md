@@ -15,26 +15,7 @@ Library and tests are based on [Mars Protocol's](https://github.com/mars-protoco
 
 ### 1. Create a json distribution list
 
-Sample format:
-
-```json
-{
-    [
-        {
-            "address": "terra1k0jntykt7e4g3y88ltc60czgjuqdy4c9ax8tx2",
-            "amount": "43454523323"
-        },
-        {
-            "address": "terra1xzlgeyuuyqje79ma6vllregprkmgwgavjx2h6m",
-            "amount": "1343252443"
-        }
-    ]
-}
-```
-
-Use it as imput for script:
-
-> TODO
+See [merkle-cli](./merkle-cli/).
 
 ## Instantiate
 
