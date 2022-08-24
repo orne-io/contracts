@@ -40,7 +40,7 @@ pub fn instantiate(
     let config = Config {
         owner,
         token_address: deps.api.addr_validate(&msg.token_address)?,
-        merkle_roots: msg.merkle_roots,
+        merkle_root: msg.merkle_root,
         from_timestamp,
         to_timestamp: msg.to_timestamp,
     };
@@ -70,8 +70,7 @@ pub fn execute(deps: DepsMut, env: Env, info: MessageInfo, msg: ExecuteMsg) -> S
         ExecuteMsg::Claim {
             claim_amount,
             merkle_proof,
-            root_index,
-        } => execute::claim(deps, env, info, claim_amount, merkle_proof, root_index),
+        } => execute::claim(deps, env, info, claim_amount, merkle_proof),
 
         ExecuteMsg::TransferUnclaimedTokens { recipient, amount } => {
             execute::transfer_unclaimed_tokens(deps, env, info, recipient, amount)
