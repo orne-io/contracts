@@ -50,14 +50,11 @@ pub fn execute(deps: DepsMut, env: Env, info: MessageInfo, msg: ExecuteMsg) -> S
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
-pub fn query(_: Deps, _: Env, msg: QueryMsg) -> StdResult<Binary> {
+pub fn query(deps: Deps, _: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
-        QueryMsg::Config {} => todo!(),
-        QueryMsg::State { block_height: _ } => todo!(),
-        QueryMsg::StakerInfo {
-            staker: _,
-            height: _,
-        } => todo!(),
+        QueryMsg::Config {} => query::config(deps),
+        QueryMsg::State { height } => query::state(deps, height),
+        QueryMsg::Staker { staker, height } => query::staker(deps, staker, height),
     }
 }
 

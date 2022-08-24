@@ -38,8 +38,8 @@ pub mod msg {
     #[serde(rename_all = "snake_case")]
     pub enum QueryMsg {
         Config {},
-        State { block_height: Option<u64> },
-        StakerInfo { staker: String, height: Option<u64> },
+        State { height: Option<u64> },
+        Staker { staker: String, height: Option<u64> },
     }
 
     #[derive(Serialize, Deserialize, Clone, PartialEq, Eq, Debug)]
@@ -61,15 +61,14 @@ pub mod response {
     #[derive(Serialize, Deserialize, Clone, PartialEq, Eq, Debug)]
     pub struct StateResponse {
         pub last_distributed: u64,
-        pub total_bond_amount: Uint128,
+        pub total_stake_amount: Uint128,
         pub global_reward_index: Decimal,
     }
 
     #[derive(Serialize, Deserialize, Clone, PartialEq, Eq, Debug)]
-    pub struct StakerInfoResponse {
-        pub staker: String,
+    pub struct StakerResponse {
         pub reward_index: Decimal,
-        pub bond_amount: Uint128,
+        pub stake_amount: Uint128,
         pub pending_reward: Uint128,
     }
 }
