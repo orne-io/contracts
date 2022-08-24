@@ -91,3 +91,43 @@ pub fn unstake(deps: DepsMut, env: Env, info: MessageInfo, amount: Uint128) -> S
         .add_attribute("from", info.sender)
         .add_attribute("amount", amount))
 }
+
+pub fn withdraw_rewards(deps: DepsMut, env: Env, info: MessageInfo) -> StdResult<Response> {
+    let config = CONFIG.load(deps.storage)?;
+    let mut state = STATE.load(deps.storage)?;
+    let mut staker = STAKERS.load(deps.storage, &info.sender)?;
+
+    // Compute global reward & staker reward
+    state.compute_reward(&config.distribution_schedule, env.block.height);
+    staker.compute_reward(state.global_reward_index)?;
+
+    // Reset rewards
+    let amount = staker.pending_reward;
+    staker.pending_reward = Uint128::zero();
+
+    // Remove staker if no stake, otherwise save it
+    if staker.stake_amount.is_zero() {
+        STAKERS.remove(deps.storage, &info.sender);
+    } else {
+        STAKERS.save(deps.storage, &info.sender, &staker)?;
+    }
+
+    // Save state
+    STATE.save(deps.storage, &state)?;
+
+    // Build cw20 transfer msg
+    let msg = CosmosMsg::Wasm(WasmMsg::Execute {
+        contract_addr: config.token.to_string(),
+        msg: to_binary(&Cw20ExecuteMsg::Transfer {
+            recipient: info.sender.to_string(),
+            amount,
+        })?,
+        funds: vec![],
+    });
+
+    Ok(Response::new()
+        .add_message(msg)
+        .add_attribute("action", "withdraw_rewards")
+        .add_attribute("from", info.sender)
+        .add_attribute("amount", amount))
+}
