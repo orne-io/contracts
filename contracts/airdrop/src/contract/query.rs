@@ -1,7 +1,5 @@
 use cosmwasm_std::{to_binary, Binary, Deps, StdResult};
-use orne_periphery::airdrop::response::{
-    ConfigResponse, HasUserClaimedResponse, StateResponse, UserInfoResponse,
-};
+use orne_periphery::airdrop::response::{ClaimInfoResponse, ConfigResponse, StateResponse};
 
 use crate::state::{CONFIG, STATE, USERS};
 
@@ -24,22 +22,11 @@ pub fn state(deps: Deps) -> StdResult<Binary> {
     })
 }
 
-pub fn user_info(deps: Deps, address: String) -> StdResult<Binary> {
+pub fn claim_info(deps: Deps, address: String) -> StdResult<Binary> {
     let address = deps.api.addr_validate(&address)?;
     let user_info = USERS.may_load(deps.storage, &address)?.unwrap_or_default();
-    to_binary(&UserInfoResponse {
-        airdrop_amount: user_info.claimed_amount,
-        tokens_withdrawn: user_info.tokens_withdrawn,
-    })
-}
-
-pub fn has_user_claimed(deps: Deps, address: String) -> StdResult<Binary> {
-    let user_address = deps.api.addr_validate(&address)?;
-    let user_info = USERS
-        .may_load(deps.storage, &user_address)?
-        .unwrap_or_default();
-
-    to_binary(&HasUserClaimedResponse {
-        has_claimed: !user_info.claimed_amount.is_zero(),
+    to_binary(&ClaimInfoResponse {
+        has_claimed: user_info.tokens_withdrawn,
+        claimed_amount: user_info.claimed_amount,
     })
 }

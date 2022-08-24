@@ -83,8 +83,7 @@ pub fn query(deps: Deps, _: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
         QueryMsg::Config {} => query::config(deps),
         QueryMsg::State {} => query::state(deps),
-        QueryMsg::UserInfo { address } => query::user_info(deps, address),
-        QueryMsg::HasUserClaimed { address } => query::has_user_claimed(deps, address),
+        QueryMsg::ClaimInfo { address } => query::claim_info(deps, address),
     }
 }
 

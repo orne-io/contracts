@@ -46,8 +46,7 @@ pub mod msg {
     pub enum QueryMsg {
         Config {},
         State {},
-        UserInfo { address: String },
-        HasUserClaimed { address: String },
+        ClaimInfo { address: String },
     }
 
     #[derive(Serialize, Deserialize, Clone, PartialEq, Eq, Debug)]
@@ -73,9 +72,9 @@ pub mod response {
     }
 
     #[derive(Serialize, Deserialize, Clone, PartialEq, Eq, Debug)]
-    pub struct UserInfoResponse {
-        pub airdrop_amount: Uint128,
-        pub tokens_withdrawn: bool,
+    pub struct ClaimInfoResponse {
+        pub has_claimed: bool,
+        pub claimed_amount: Uint128,
     }
 
     #[derive(Serialize, Deserialize, Clone, PartialEq, Eq, Debug)]
