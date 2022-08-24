@@ -25,11 +25,6 @@ pub mod msg {
 
         /// Withdraw pending rewards
         WithdrawRewards {},
-
-        /// Admin function stoping distribution and sending remaining tokens to a new contract
-        MigrateStaking {
-            new_contract: String,
-        },
     }
 
     #[derive(Serialize, Deserialize, Clone, PartialEq, Eq, Debug)]

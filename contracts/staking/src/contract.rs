@@ -46,7 +46,6 @@ pub fn execute(deps: DepsMut, env: Env, info: MessageInfo, msg: ExecuteMsg) -> S
         ExecuteMsg::Receive(cw20_msg) => execute::receive_cw20(deps, env, info, cw20_msg),
         ExecuteMsg::Unstake { amount } => execute::unstake(deps, env, info, amount),
         ExecuteMsg::WithdrawRewards {} => execute::withdraw_rewards(deps, env, info),
-        ExecuteMsg::MigrateStaking { new_contract: _ } => todo!(),
     }
 }
 
