@@ -4,7 +4,7 @@ use cw_multi_test::{App, ContractWrapper, Executor};
 use orne_periphery::airdrop::response::ClaimInfoResponse;
 use orne_periphery::airdrop::{
     msg::{ExecuteMsg, InstantiateMsg, QueryMsg},
-    response::{ConfigResponse, HasUserClaimedResponse, StateResponse},
+    response::{ConfigResponse, StateResponse},
 };
 
 fn mock_app() -> App {
@@ -295,7 +295,7 @@ fn claim() {
     // User hasn't yet claimed the airdrop
     let res = app
         .wrap()
-        .query_wasm_smart::<HasUserClaimedResponse>(
+        .query_wasm_smart::<ClaimInfoResponse>(
             &airdrop_instance,
             &QueryMsg::ClaimInfo {
                 address: "terra17lmam6zguazs5q5u6z5mmx76uj63gldnse2pdp".to_string(),
@@ -341,7 +341,7 @@ fn claim() {
     // Verify user successfully claimed airdrop
     let res = app
         .wrap()
-        .query_wasm_smart::<HasUserClaimedResponse>(
+        .query_wasm_smart::<ClaimInfoResponse>(
             &airdrop_instance,
             &QueryMsg::ClaimInfo {
                 address: "terra17lmam6zguazs5q5u6z5mmx76uj63gldnse2pdp".to_string(),

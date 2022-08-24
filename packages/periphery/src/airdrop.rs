@@ -76,9 +76,4 @@ pub mod response {
         pub has_claimed: bool,
         pub claimed_amount: Uint128,
     }
-
-    #[derive(Serialize, Deserialize, Clone, PartialEq, Eq, Debug)]
-    pub struct HasUserClaimedResponse {
-        pub has_claimed: bool,
-    }
 }
