@@ -16,14 +16,16 @@ Tasks are run through [`cargo-make`](https://github.com/sagiegurari/cargo-make).
 | Name                          | Mainnet | Testnet |
 | ----------------------------- | ------- | ------- |
 | [token](contracts/token/)     | -       | `2995`  |
-| [airdrop](contracts/airdrop/) | -       | `2996`  |
+| [airdrop](contracts/airdrop/) | -       | `3428`  |
+| [staking](contracts/staking/) | -       | -       |
 
 ### Instances
 
-| Name                          | Mainnet | Testnet                                                                                                                                                                           |
-| ----------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [token](contracts/token/)     | -       | [`terra17lpau...snck5`](https://finder.terra.money/testnet/address/terra17lpau4t55q48g0utuh4cf0mderjkvddv0pdu3lazm6znnp95fq4susnck5) |
-| [airdrop](contracts/airdrop/) | -       | [`terra13ktv2...l9760`](https://finder.terra.money/testnet/address/terra13ktv2qjs44k8wjgkgtvseezjewdxfxv9pqsfd0t6qtkhm5w460hsml9760) |
+| Name                          | Mainnet | Testnet                                                                                                                              |
+| ----------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| [token](contracts/token/)     | -       | [`terra1f4mp7...gqu78`](https://finder.terra.money/testnet/address/terra1f4mp7uxaq2je5c0mrxe4akd984487lxv4nu2lsyw0gvpr6l63yqsngqu78) |
+| [airdrop](contracts/airdrop/) | -       | [`terra1gxgxs...jgx3m`](https://finder.terra.money/testnet/address/terra1gxgxsn2kdw8539gq7nzlrcjyp5glp2lnaqkqyn4ur9ttmjufg70qfjgx3m) |
+| [staking](contracts/staking/) | -       | -                                                                                                                                    |
 
 ## Packages
 
