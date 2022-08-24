@@ -15,7 +15,8 @@ pub fn receive_cw20(
 ) -> StdResult<Response> {
     let config = CONFIG.load(deps.storage)?;
 
-    if config.token != info.sender {
+    // Only accept lp token in config
+    if config.lp_token != info.sender {
         return Err(StdError::generic_err("incorrect token"));
     }
 
@@ -77,7 +78,7 @@ pub fn unstake(deps: DepsMut, env: Env, info: MessageInfo, amount: Uint128) -> S
 
     // Build cw20 transfer msg
     let msg = CosmosMsg::Wasm(WasmMsg::Execute {
-        contract_addr: config.token.to_string(),
+        contract_addr: config.lp_token.to_string(),
         msg: to_binary(&Cw20ExecuteMsg::Transfer {
             recipient: info.sender.to_string(),
             amount,
