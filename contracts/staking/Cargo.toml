@@ -1,0 +1,32 @@
+[package]
+edition = "2021"
+name = "orne-staking"
+version = "0.1.0"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+# use library feature to disable all instantiate/execute/query exports
+library = []
+
+[dependencies]
+cosmwasm-std = "1.0"
+cw-storage-plus = "0.14"
+cw2 = "0.14"
+cw20 = "0.14"
+cw20-base = "0.14"
+thiserror = "1.0"
+
+[dependencies.orne-periphery]
+path = "../../packages/periphery"
+
+[dependencies.serde]
+default-features = false
+features = ["derive"]
+version = "1.0"
+
+[dev-dependencies]
+cw-multi-test = "0.14"

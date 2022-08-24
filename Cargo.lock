@@ -509,6 +509,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "orne-staking"
+version = "0.1.0"
+dependencies = [
+ "cosmwasm-std",
+ "cw-multi-test",
+ "cw-storage-plus",
+ "cw2",
+ "cw20",
+ "cw20-base",
+ "orne-periphery",
+ "serde",
+ "thiserror",
+]
+
+[[package]]
 name = "orne-token"
 version = "0.1.0"
 dependencies = [

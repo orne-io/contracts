@@ -2,7 +2,7 @@
 
 Airdrop contract for orne relaunch on Terra 2.
 
-Library and tests are based on [Mars Protocol's](https://github.com/mars-protocol) codebase [airdrop contract](https://github.com/mars-protocol/mars-periphery/tree/main/contracts/airdrop).
+**Disclaimer:** Library and tests are based on [Mars Protocol's](https://github.com/mars-protocol) [airdrop contract](https://github.com/mars-protocol/mars-periphery/tree/main/contracts/airdrop) codebase.
 
 ## Interface
 
