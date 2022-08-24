@@ -32,3 +32,4 @@ Tasks are run through [`cargo-make`](https://github.com/sagiegurari/cargo-make).
 Contains types (msgs + responses) and helpers for periphery contracts, including:
 
 * `airdrop`
+* `staking`
