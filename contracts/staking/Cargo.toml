@@ -17,7 +17,6 @@ cosmwasm-std = "1.0"
 cw-storage-plus = "0.14"
 cw2 = "0.14"
 cw20 = "0.14"
-cw20-base = "0.14"
 thiserror = "1.0"
 
 [dependencies.orne-periphery]

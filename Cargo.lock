@@ -517,7 +517,6 @@ dependencies = [
  "cw-storage-plus",
  "cw2",
  "cw20",
- "cw20-base",
  "orne-periphery",
  "serde",
  "thiserror",
