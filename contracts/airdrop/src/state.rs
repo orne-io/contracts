@@ -14,7 +14,7 @@ pub struct Config {
     /// Address of the cw20 token
     pub token_address: Addr,
     /// Merkle roots used to verify if a user is eligible for the airdrop
-    pub merkle_roots: Vec<String>,
+    pub merkle_root: String,
     /// Timestamp of the airdrop start
     pub from_timestamp: u64,
     /// Timestamp of the airdrop end
@@ -70,7 +70,7 @@ mod tests {
         let config = Config {
             owner: Addr::unchecked("test"),
             token_address: Addr::unchecked("test"),
-            merkle_roots: vec![],
+            merkle_root: "".to_string(),
             from_timestamp: 10,
             to_timestamp: 20,
         };

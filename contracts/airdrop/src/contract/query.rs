@@ -10,7 +10,7 @@ pub fn config(deps: Deps) -> StdResult<Binary> {
     to_binary(&ConfigResponse {
         token_address: config.token_address.to_string(),
         owner: config.owner.to_string(),
-        merkle_roots: config.merkle_roots,
+        merkle_root: config.merkle_root,
         from_timestamp: config.from_timestamp,
         to_timestamp: config.to_timestamp,
     })

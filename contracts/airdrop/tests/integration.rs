@@ -57,9 +57,7 @@ fn init_contracts(app: &mut App) -> (Addr, InstantiateMsg, Addr, u64) {
     let airdrop_init_msg = InstantiateMsg {
         owner: Some(owner.to_string()),
         token_address: token_instance.clone().into_string(),
-        merkle_roots: vec![
-            "cdcdfad1c342f5f55a2639dcae7321a64cd000807fa24c2c4ddaa944fd52d34e".to_string(),
-        ],
+        merkle_root: "cdcdfad1c342f5f55a2639dcae7321a64cd000807fa24c2c4ddaa944fd52d34e".to_string(),
         from_timestamp: Some(1571897419),
         to_timestamp: 1581797419,
         airdrop_size: 100_000_000_000u128.into(), // utoken, 100,000 token
@@ -112,7 +110,7 @@ fn proper_initialization() {
 
     assert_eq!(res.token_address, init_msg.token_address);
     assert_eq!(res.owner, init_msg.owner.unwrap());
-    assert_eq!(res.merkle_roots, init_msg.merkle_roots);
+    assert_eq!(res.merkle_root, init_msg.merkle_root);
     assert_eq!(res.from_timestamp, init_msg.from_timestamp.unwrap());
     assert_eq!(res.to_timestamp, init_msg.to_timestamp);
 
@@ -222,7 +220,6 @@ fn claim() {
             "7719b79a65e5aa0bbfd144cf5373138402ab1c374d9049e490b5b61c23d90065".to_string(),
             "60368f2058e0fb961a7721a241f9b973c3dd6c57e10a627071cd81abca6aa490".to_string(),
         ],
-        root_index: 0,
     };
     let claim_msg_wrong_amount = ExecuteMsg::Claim {
         claim_amount: 210000000u128.into(),
@@ -230,23 +227,14 @@ fn claim() {
             "7719b79a65e5aa0bbfd144cf5373138402ab1c374d9049e490b5b61c23d90065".to_string(),
             "60368f2058e0fb961a7721a241f9b973c3dd6c57e10a627071cd81abca6aa490".to_string(),
         ],
-        root_index: 0,
     };
-    let claim_msg_incorrect_root = ExecuteMsg::Claim {
-        claim_amount: 250000000u128.into(),
-        merkle_proof: vec![
-            "7719b79a65e4aa0bbfd144cf5373138402ab1c374d9049e490b5b61c23d90065".to_string(),
-            "60368f2058e0fb961a7721a241f9b973c3dd6c57e10a627071cd81abca6aa490".to_string(),
-        ],
-        root_index: 5,
-    };
+
     let claim_msg_incorrect_proof = ExecuteMsg::Claim {
         claim_amount: 250000000u128.into(),
         merkle_proof: vec![
             "7719b79a65e4aa0bbfd144cf5373138402ab1c374d9049e490b5b61c23d90065".to_string(),
             "60368f2058e0fb961a7721a241f9b973c3dd6c57e10a627071cd81abca6aa490".to_string(),
         ],
-        root_index: 0,
     };
 
     // Claim period has not started yet
@@ -274,20 +262,6 @@ fn claim() {
         b.height += 17280;
         b.time = Timestamp::from_seconds(1571897424)
     });
-
-    // Claim fails (Incorrect merkle root index)
-    let err = app
-        .execute_contract(
-            Addr::unchecked("terra17lmam6zguazs5q5u6z5mmx76uj63gldnse2pdp".to_string()),
-            airdrop_instance.clone(),
-            &claim_msg_incorrect_root,
-            &[],
-        )
-        .unwrap_err()
-        .root_cause()
-        .to_string();
-
-    assert_eq!(err, "Generic error: Incorrect Merkle Root Index");
 
     // Claim fails (Incorrect merkle proof)
     let err = app

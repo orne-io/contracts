@@ -10,7 +10,7 @@ pub mod msg {
     pub struct InstantiateMsg {
         pub owner: Option<String>,
         pub token_address: String,
-        pub merkle_roots: Vec<String>,
+        pub merkle_root: String,
         pub from_timestamp: Option<u64>,
         pub to_timestamp: u64,
         pub airdrop_size: Uint128,
@@ -32,7 +32,6 @@ pub mod msg {
         Claim {
             claim_amount: Uint128,
             merkle_proof: Vec<String>,
-            root_index: u32,
         },
 
         /// Admin function to facilitate transfer of the unclaimed tokens
@@ -62,7 +61,7 @@ pub mod response {
     pub struct ConfigResponse {
         pub owner: String,
         pub token_address: String,
-        pub merkle_roots: Vec<String>,
+        pub merkle_root: String,
         pub from_timestamp: u64,
         pub to_timestamp: u64,
     }

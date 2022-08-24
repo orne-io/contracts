@@ -76,7 +76,6 @@ pub fn claim(
     info: MessageInfo,
     claim_amount: Uint128,
     merkle_proof: Vec<String>,
-    root_index: u32,
 ) -> Result<Response, StdError> {
     let recipient = info.sender;
 
@@ -93,14 +92,8 @@ pub fn claim(
         return Err(StdError::generic_err("Airdrop has concluded"));
     }
 
-    // Check merkle root index
-    let merkle_root = config.merkle_roots.get(root_index as usize);
-    if merkle_root.is_none() {
-        return Err(StdError::generic_err("Incorrect Merkle Root Index"));
-    }
-
     // Check merkle proof
-    if !verify_claim(&recipient, claim_amount, merkle_proof, merkle_root.unwrap()) {
+    if !verify_claim(&recipient, claim_amount, merkle_proof, &config.merkle_root) {
         return Err(StdError::generic_err("Incorrect Merkle Proof"));
     }
 
