@@ -1,9 +1,10 @@
 use cosmwasm_std::{attr, Addr, Timestamp, Uint128};
 use cw20::Cw20ExecuteMsg;
 use cw_multi_test::{App, ContractWrapper, Executor};
+use orne_periphery::airdrop::response::ClaimInfoResponse;
 use orne_periphery::airdrop::{
     msg::{ExecuteMsg, InstantiateMsg, QueryMsg},
-    response::{ConfigResponse, HasUserClaimedResponse, StateResponse, UserInfoResponse},
+    response::{ConfigResponse, StateResponse},
 };
 
 fn mock_app() -> App {
@@ -294,9 +295,9 @@ fn claim() {
     // User hasn't yet claimed the airdrop
     let res = app
         .wrap()
-        .query_wasm_smart::<HasUserClaimedResponse>(
+        .query_wasm_smart::<ClaimInfoResponse>(
             &airdrop_instance,
-            &QueryMsg::HasUserClaimed {
+            &QueryMsg::ClaimInfo {
                 address: "terra17lmam6zguazs5q5u6z5mmx76uj63gldnse2pdp".to_string(),
             },
         )
@@ -306,16 +307,16 @@ fn claim() {
 
     let res = app
         .wrap()
-        .query_wasm_smart::<UserInfoResponse>(
+        .query_wasm_smart::<ClaimInfoResponse>(
             &airdrop_instance,
-            &QueryMsg::UserInfo {
+            &QueryMsg::ClaimInfo {
                 address: "terra17lmam6zguazs5q5u6z5mmx76uj63gldnse2pdp".to_string(),
             },
         )
         .unwrap();
 
-    assert!(Uint128::is_zero(&res.airdrop_amount));
-    assert!(!res.tokens_withdrawn);
+    assert!(Uint128::is_zero(&res.claimed_amount));
+    assert!(!res.has_claimed);
 
     // Claim succeed
     let res = app
@@ -340,9 +341,9 @@ fn claim() {
     // Verify user successfully claimed airdrop
     let res = app
         .wrap()
-        .query_wasm_smart::<HasUserClaimedResponse>(
+        .query_wasm_smart::<ClaimInfoResponse>(
             &airdrop_instance,
-            &QueryMsg::HasUserClaimed {
+            &QueryMsg::ClaimInfo {
                 address: "terra17lmam6zguazs5q5u6z5mmx76uj63gldnse2pdp".to_string(),
             },
         )
@@ -352,16 +353,16 @@ fn claim() {
 
     let res = app
         .wrap()
-        .query_wasm_smart::<UserInfoResponse>(
+        .query_wasm_smart::<ClaimInfoResponse>(
             &airdrop_instance,
-            &QueryMsg::UserInfo {
+            &QueryMsg::ClaimInfo {
                 address: "terra17lmam6zguazs5q5u6z5mmx76uj63gldnse2pdp".to_string(),
             },
         )
         .unwrap();
 
-    assert_eq!(res.airdrop_amount, 250_000_000u128.into());
-    assert!(res.tokens_withdrawn);
+    assert_eq!(res.claimed_amount, 250_000_000u128.into());
+    assert!(res.has_claimed);
 
     let res = app
         .wrap()
