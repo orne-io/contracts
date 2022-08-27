@@ -24,7 +24,7 @@ Tasks are run through [`cargo-make`](https://github.com/sagiegurari/cargo-make).
 | Name                          | Mainnet | Testnet                                                                                                                              |
 | ----------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------ |
 | [token](contracts/token/)     | -       | [`terra1f4mp7...gqu78`](https://finder.terra.money/testnet/address/terra1f4mp7uxaq2je5c0mrxe4akd984487lxv4nu2lsyw0gvpr6l63yqsngqu78) |
-| [airdrop](contracts/airdrop/) | -       | [`terra1gxgxs...jgx3m`](https://finder.terra.money/testnet/address/terra1gxgxsn2kdw8539gq7nzlrcjyp5glp2lnaqkqyn4ur9ttmjufg70qfjgx3m) |
+| [airdrop](contracts/airdrop/) | -       | [`terra1h3qxl...8nh9m`](https://finder.terra.money/testnet/address/terra1h3qxlz5fzl8hht4z8sxc00hzs8mnd34djle5tl0hclwkkxpx8tasa8nh9m) |
 | [staking](contracts/staking/) | -       | -                                                                                                                                    |
 
 ## Packages
