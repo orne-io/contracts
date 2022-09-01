@@ -17,8 +17,8 @@ See [merkle-cli](./merkle-cli/).
 
 ### `airdrop.json`
 
-* [Testnet](https://github.com/orne-io/contracts/files/9419207/airdrop.zip)
-* [Mainnet](https://github.com/orne-io/contracts/files/9331613/airdrop.zip)
+* [Testnet](https://github.com/orne-io/contracts/files/9331613/airdrop.zip)
+* [Mainnet](https://github.com/orne-io/contracts/files/9471633/airdrop.zip)
 
 ## Instantiate
 
