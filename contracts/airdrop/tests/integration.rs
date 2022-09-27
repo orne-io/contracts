@@ -213,7 +213,7 @@ fn claim() {
         )
         .unwrap();
 
-    assert_eq!(res.balance, 100_000_000_000u128.into());
+    assert_eq!(res.balance, Uint128::from(100_000_000_000u128));
 
     let claim_msg = ExecuteMsg::Claim {
         claim_amount: 250000000u128.into(),
@@ -361,7 +361,7 @@ fn claim() {
         )
         .unwrap();
 
-    assert_eq!(res.claimed_amount, 250_000_000u128.into());
+    assert_eq!(res.claimed_amount, Uint128::from(250_000_000u128));
     assert!(res.has_claimed);
 
     let res = app
@@ -369,8 +369,8 @@ fn claim() {
         .query_wasm_smart::<StateResponse>(&airdrop_instance, &QueryMsg::State {})
         .unwrap();
 
-    assert_eq!(res.total_airdrop_size, 100_000_000_000u128.into());
-    assert_eq!(res.unclaimed_tokens, 99_750_000_000u128.into());
+    assert_eq!(res.total_airdrop_size, Uint128::from(100_000_000_000u128));
+    assert_eq!(res.unclaimed_tokens, Uint128::from(99_750_000_000u128));
 
     // Check user token balance
     let res = app
@@ -383,7 +383,7 @@ fn claim() {
         )
         .unwrap();
 
-    assert_eq!(res.balance, 250_000_000u128.into());
+    assert_eq!(res.balance, Uint128::from(250_000_000u128));
 
     // Claim fails (already claimed)
     let err = app
@@ -457,7 +457,7 @@ fn test_transfer_unclaimed_tokens() {
         )
         .unwrap();
 
-    assert_eq!(res.balance, 100_000_000_000u128.into());
+    assert_eq!(res.balance, Uint128::from(100_000_000_000u128));
 
     // Can only be called by the owner
     let err = app
@@ -548,5 +548,5 @@ fn test_transfer_unclaimed_tokens() {
         )
         .unwrap();
 
-    assert_eq!(res.balance, 99_990_000_000u128.into());
+    assert_eq!(res.balance, Uint128::from(99_990_000_000u128));
 }
