@@ -18,6 +18,7 @@ Tasks are run through [`cargo-make`](https://github.com/sagiegurari/cargo-make).
 | [token](contracts/token/)     | `376`   | `2995`  |
 | [airdrop](contracts/airdrop/) | `377`   | `3428`  |
 | [staking](contracts/staking/) | -       | -       |
+| [nft](contracts/nft/)       | -       | -       |
 
 ### Instances
 
