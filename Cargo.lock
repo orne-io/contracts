@@ -448,6 +448,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "entropy_beacon_cosmos"
+version = "1.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "475156f65aaabde3b7724812b70516ff282f79a1672c8bc9792e728100166468"
+dependencies = [
+ "cosmwasm-std",
+ "schemars",
+ "serde",
+]
+
+[[package]]
 name = "ff"
 version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -606,6 +617,15 @@ dependencies = [
  "cw20-base",
  "serde",
  "thiserror",
+]
+
+[[package]]
+name = "orne-presale-minter"
+version = "0.1.0"
+dependencies = [
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "entropy_beacon_cosmos",
 ]
 
 [[package]]
