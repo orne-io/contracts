@@ -7,6 +7,10 @@ pub enum QueryMsg {
     #[returns(MintRequestStatus)]
     MintRequestStatus { id: u32 },
 
+    /// Get status of mint requests
+    #[returns(Vec<MintRequestStatus>)]
+    MintRequestsStatuses { limit: u8, from: u32 },
+
     /// Get the minter config
     #[returns(ConfigResponse)]
     Config,
